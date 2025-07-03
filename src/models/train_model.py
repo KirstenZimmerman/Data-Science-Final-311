@@ -1,43 +1,35 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 
 
-def main():
-    # For working with data
-    import pandas as pd
-    
-    # For visualization
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-    import plotly.express as px
-    
-    # For machine learning modeling
-    from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.neighbors import KNeighborsClassifier
-    from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, f1_score
+def train_models(df: pd.DataFrame):
+    """Train baseline and k-NN models and return predictions."""
+    X = df.drop('fraud', axis=1)
+    y = df['fraud']
 
-    # Select features and target variable
-    X = transaction_data_cleaned.drop('fraud', axis=1)
-    y = transaction_data_cleaned['fraud']
-    
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
 
-    # Train a k-NN classifier
+    # Baseline model: never predict fraud
+    y_pred_baseline = [0] * len(y_test)
+
+    # k-NN model
     knn = KNeighborsClassifier(n_neighbors=3)
     knn.fit(X_train, y_train)
-    
-    # Make predictions
     y_pred_knn = knn.predict(X_test)
-    
-    # Print just the first 100 predictions
-    print(y_pred_knn[:100]) # Notice how some predictions are 1, fradulent!
+
+    return y_test, y_pred_baseline, y_pred_knn
 
 
+if __name__ == "__main__":
+    from src.data.load_data import load_dataset
+    from src.features.build_features import clean_dataset
 
-if __name__ == '__main__':
-    main()
+    raw = load_dataset("data/raw/card_transdata.csv")
+    clean = clean_dataset(raw)
+    y_test, baseline, knn = train_models(clean)
+    print("Baseline sample:", baseline[:5])
+    print("k-NN sample:", knn[:5])

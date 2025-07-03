@@ -1,14 +1,14 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
 
 
-def main():
-    # Drop rows with null values
-    transaction_data_cleaned = transaction_data_raw.dropna().copy()
-    print(transaction_data_cleaned.shape)
+def clean_dataset(df: pd.DataFrame) -> pd.DataFrame:
+    """Clean the dataset by dropping rows with missing values."""
+    return df.dropna().copy()
 
 
+if __name__ == "__main__":
+    from src.data.load_data import load_dataset
 
-if __name__ == '__main__':
-    main()
+    raw = load_dataset("data/raw/card_transdata.csv")
+    cleaned = clean_dataset(raw)
+    print(cleaned.head())
