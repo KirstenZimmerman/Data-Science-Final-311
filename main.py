@@ -7,30 +7,55 @@ from src.models.dumb_model import train_dumb_model
 from src.visualization.performance import (
     plot_confusion_matrices,
     plot_performance_comparison,
+    
+    churn_distribution,
+    numeric_histograms,
+    categorical_churn,
+    correlation_heatmap
 )
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+import pandas as pd
 
 
 def main() -> None:
+
     print("---Loading data...")
-    raw_df = load_dataset("data/raw/card_transdata.csv")
-    
+    #raw_df = load_dataset("data/raw/card_transdata.csv")
+    train_raw, test_raw = load_train_test(
+        "data/raw/train.csv",
+        "data/raw/test.csv",
+    )
+
     # Print shape of the raw dataset
-    print(f"Raw dataset shape: {raw_df.shape}")
+    print(f"Raw dataset shape: {train_raw.shape}")
 
     print("---Cleaning data...")
-    clean_df = clean_dataset(raw_df)
+    train_clean, test_clean = clean_dataset(train_raw, test_raw)
 
-    print(f"Cleaned dataset shape: {clean_df.shape}")
+    print(f"Cleaned dataset shape: {train_clean.shape}")
+
+    train_clean.to_csv("data/processed/train_clean.csv", index=False)
+    test_clean.to_csv("data/processed/test_clean.csv", index=False)
 
     print("---Creating EDA visuals...")
-    plot_eda(clean_df)
+    plot_eda(train_clean)
+
+    # EDA
+    churn_distribution(train_clean)
+    numeric_histograms(train_clean)
+    categorical_churn(train_clean)
+    correlation_heatmap(train_clean)
 
     print("---Splitting data...")
-    X_train, X_val, X_test, y_train, y_val, y_test = split_data(clean_df)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_data(clean_train_df)
 
+
+
+
+#stopped here
     print("---Training models...")
     knn_model = train_knn_model(X_train, y_train)
     dumb_model = train_dumb_model(X_train, y_train)
@@ -67,6 +92,6 @@ def main() -> None:
 
     print("Done.")
 
-
+#st here
 if __name__ == "__main__":
     main()
