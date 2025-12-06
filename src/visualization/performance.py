@@ -3,51 +3,114 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 
-
 def plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn) -> None:
     """Plot confusion matrices for both models."""
     conf_baseline = confusion_matrix(y_test, y_pred_baseline)
     conf_knn = confusion_matrix(y_test, y_pred_knn)
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
     sns.heatmap(conf_baseline, annot=True, fmt='d', cmap='Reds', ax=axes[0])
-    axes[0].set_title('Never Fraud')
+    axes[0].set_title('Predict No Churn')
+    axes[0].set_xlabel("Predicted")
+    axes[0].set_ylabel("Actual")
+
     sns.heatmap(conf_knn, annot=True, fmt='d', cmap='Blues', ax=axes[1])
-    axes[1].set_title('3-NN')
+    axes[1].set_title('k-NN')
+    axes[1].set_xlabel("Predicted")
+    axes[1].set_ylabel("Actual")
+
     plt.tight_layout()
     plt.show()
-
 
 def plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn) -> None:
     """Create a bar chart comparing model metrics."""
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
+
     baseline_scores = [
         accuracy_score(y_test, y_pred_baseline),
         precision_score(y_test, y_pred_baseline, zero_division=0),
         recall_score(y_test, y_pred_baseline),
-        f1_score(y_test, y_pred_baseline)
+        f1_score(y_test, y_pred_baseline),
     ]
+
     knn_scores = [
         accuracy_score(y_test, y_pred_knn),
-        precision_score(y_test, y_pred_knn),
+        precision_score(y_test, y_pred_knn, zero_division=0),
         recall_score(y_test, y_pred_knn),
-        f1_score(y_test, y_pred_knn)
+        f1_score(y_test, y_pred_knn),
     ]
-    df = pd.DataFrame({'Metric': metrics, 'k-NN': knn_scores, 'Never Fraud': baseline_scores})
+
+    df = pd.DataFrame({'Metric': metrics, 'k-NN': knn_scores, 'Predict No Churn': baseline_scores})
+
     df.plot(x='Metric', kind='bar', figsize=(8, 5))
     plt.ylim(0, 1)
     plt.title('Model Performance Comparison')
     plt.tight_layout()
     plt.show()
 
-
 if __name__ == "__main__":
-    from src.data.load_data import load_dataset
+    from src.data.load_data import load_train_test
     from src.data.preprocess import clean_dataset
     from src.models.train_model import train_models
 
-    raw = load_dataset("data/raw/card_transdata.csv")
-    clean = clean_dataset(raw)
-    y_test, baseline, knn = train_models(clean)
-    plot_confusion_matrices(y_test, baseline, knn)
-    plot_performance_comparison(y_test, baseline, knn)
+    train_raw, test_raw = load_train_test(
+        "data/raw/train.csv",
+        "data/raw/test.csv",
+    )
+
+    train_clean, test_clean = clean_dataset(train_raw, test_raw)
+
+    y_test, y_pred_baseline, y_pred_knn = train_models(train_clean)
+  
+    plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn)
+    plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn)
+
+
+# def plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn) -> None:
+#     """Plot confusion matrices for both models."""
+#     conf_baseline = confusion_matrix(y_test, y_pred_baseline)
+#     conf_knn = confusion_matrix(y_test, y_pred_knn)
+
+#     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+#     sns.heatmap(conf_baseline, annot=True, fmt='d', cmap='Reds', ax=axes[0])
+#     axes[0].set_title('Never Fraud')
+#     sns.heatmap(conf_knn, annot=True, fmt='d', cmap='Blues', ax=axes[1])
+#     axes[1].set_title('3-NN')
+#     plt.tight_layout()
+#     plt.show()
+
+
+# def plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn) -> None:
+#     """Create a bar chart comparing model metrics."""
+#     metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
+#     baseline_scores = [
+#         accuracy_score(y_test, y_pred_baseline),
+#         precision_score(y_test, y_pred_baseline, zero_division=0),
+#         recall_score(y_test, y_pred_baseline),
+#         f1_score(y_test, y_pred_baseline)
+#     ]
+#     knn_scores = [
+#         accuracy_score(y_test, y_pred_knn),
+#         precision_score(y_test, y_pred_knn),
+#         recall_score(y_test, y_pred_knn),
+#         f1_score(y_test, y_pred_knn)
+#     ]
+#     df = pd.DataFrame({'Metric': metrics, 'k-NN': knn_scores, 'Never Fraud': baseline_scores})
+#     df.plot(x='Metric', kind='bar', figsize=(8, 5))
+#     plt.ylim(0, 1)
+#     plt.title('Model Performance Comparison')
+#     plt.tight_layout()
+#     plt.show()
+
+
+# if __name__ == "__main__":
+#     from src.data.load_data import load_dataset
+#     from src.data.preprocess import clean_dataset
+#     from src.models.train_model import train_models
+
+#     raw = load_dataset("data/raw/card_transdata.csv")
+#     clean = clean_dataset(raw)
+#     y_test, baseline, knn = train_models(clean)
+#     plot_confusion_matrices(y_test, baseline, knn)
+#     plot_performance_comparison(y_test, baseline, knn)

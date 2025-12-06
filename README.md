@@ -1,54 +1,87 @@
-# Credit Card Fraud Detection Example
+# Customer Churn Prediction – MAT 311 Final Project
 
-This repository is an example template that demonstrates how to structure a machine learning project for reproducibility. It includes a minimal end-to-end workflow for detecting credit card fraud using scikit‑learn.
+This repository contains my end-to-end machine learning workflow for predicting customer churn as part of the MAT 311: Introduction to Data Science final project. The goal is to prepare the dataset, explore key patterns, engineer features, build multiple predictive models, and generate a submission for a Kaggle competition evaluated using ROC AUC.
 
 ## Purpose
 
-The layout of this project mirrors the recommended directory organization shown in the assignment instructions. It can be used as a starting point for your own work or as a reference when showcasing your skills to potential employers. All code is well documented and grouped by task so you can easily build upon it.
+The project follows a production-style organizational structure modeled after industry best practices and the course guidelines. Each step—data loading, cleaning, feature engineering, modeling, evaluation, and prediction—is separated into modular scripts under src/ for clear reproducibility.
+
+Jupyter notebooks serve only for EDA and experimentation, while main.py runs the complete pipeline.
+
+This project can be used both to fulfill course requirements and as a well-organized portfolio example demonstrating end-to-end machine learning workflow skills
 
 ## Project layout
 
 ```
 .
-├── main.py                 # Entry point that runs the entire pipeline
-├── requirements.txt        # Python dependencies
+├── main.py                     # Runs full churn-prediction pipeline
+├── requirements.txt            # Python environment dependencies
+
 ├── data/
-│   ├── processed/          # Created after running the pipeline
-│   └── raw/
-│       └── card_transdata.csv
+│   ├── raw/                    # Original files 
+│   ├── processed/              # Cleaned + imputed training and test data
+│   └── submissions/            # Kaggle-ready prediction files
+
 ├── notebooks/
-│   └── credit_card_fraud_analysis.ipynb
+│   ├── eda_churn.ipynb         
+│   └── model_experiments.ipynb # Baseline, KNN, and Decision Tree
+
 └── src/
     ├── data/
-    │   ├── load_data.py
-    │   ├── preprocess.py
-    │   └── split_data.py
+    │   ├── load_data.py        # Loads raw data into pandas DataFrames
+    │   ├── clean_data.py       # Handles missing values, type conversion, and feature creation
+    │   └── split_data.py       # Train/validation split utilities
+
     ├── features/
-    │   └── build_features.py
+    │   └── build_features.py   # Constructs feature lists, encoders, and transformers
+
     ├── models/
-    │   ├── train_model.py
-    │   ├── dumb_model.py
-    │   └── knn_model.py
+    │   ├── baseline.py         # Custom baseline churn classifier
+    │   ├── knn_model.py        # KNN model pipeline
+    │   ├── decision_tree.py    # Optimized DecisionTreeClassifier    
+    │   └── random_forest.py    
+
+
     ├── utils/
-    │   └── helper_functions.py
+    │   └── helpers.py         
+
     └── visualization/
-        ├── eda.py
-        └── performance.py
+        ├── eda.py              # plots for distributions, correlations, class balance
+        └── performance.py      # Confusion matrices, ROC curves, and model comparison
 ```
 
-`main.py` imports the modules inside `src/` and executes them to reproduce the analysis and results. Jupyter notebooks are provided only for prototyping and exploration—they are **not** meant to be the main entry point of the project.
+# Models Implemented
+1. Baseline Classifier (Custom Rule-Based Model) - A model using insights from EDA, incorporating features like:
+    - Contract Length
+    - Total Spend
+    - Support Calls
+    - Tenure
+    - Age
+    - Usage Frequency
+    - Last Interaction
+Used to establish a minimum performance benchmark.
 
-Some directories such as `data/external/`, `src/utils/` and `tests/` may be empty, but the folder structure is provided to illustrate how a complete project should look.
+2. K-Nearest Neighbors (KNN)
+    - StandardScaler for numeric features
+    - OneHotEncoder for categorical features
+    - Tuned across multiple neighbor values
+    - Achieved strong validation ROC AUC
 
-## Running the example
+3. Decision Tree
+    - OneHotEncoder + StandardScaler preprocessing
+    - Tuned hyperparameters such as
+        - max_depth
+        - min_samples_leaf
+    - Used for Kaggle submissions
 
-Install the dependencies and run the pipeline. You should use the versions of the dependencies as specified by the requirements file:
+4. Random Forest Classifier - An ensemble model used to improve performance over a single decision tree.
+    - Tuned parameters such as:
+        - n_estimators
+        - max_depth
+        - min_samples_leaf
 
-```bash
-conda create -n credit_fraud --file requirements.txt
-conda activate credit_fraud
-python main.py
-```
 
-This will load the dataset, perform basic feature engineering, train a simple model and produce visualizations similar to those in the notebook.
-The cleaned data will be written to `data/processed/` and all plots will be displayed interactively.
+# Notes
+- "Payment Delay" was removed from modeling because it creates data leakage.
+- Missing values were filled using a combination of median and zeros.
+- All models are wrapped in full scikit-learn pipelines for reproducibility.

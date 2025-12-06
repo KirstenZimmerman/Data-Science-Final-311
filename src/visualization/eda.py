@@ -60,7 +60,7 @@ def churn_distribution(df):
 
 
 def numeric_histograms(df):
-    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
+    numeric_cols = df.select_dtypes(include=["int64", "float64", "Int64"]).columns
     df[numeric_cols].hist(figsize=(15,12), bins=30)
     plt.show()
 
@@ -76,7 +76,7 @@ def categorical_churn(df):
 
 
 def correlation_heatmap(df):
-    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
+    numeric_cols = df.select_dtypes(include=["int64", "float64", "Int64"]).columns
     corr = df[numeric_cols].corr()
     sns.heatmap(corr, cmap="coolwarm")
     plt.title("Correlation Heatmap")
