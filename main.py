@@ -8,6 +8,8 @@ from src.visualization.eda import (
     correlation_heatmap,
 )
 
+from src.utils.helper_functions import plot_roc_curve
+
 from src.models.knn_model import train_knn_model
 from src.models.dumb_model import train_dumb_model
 from src.models.decisionTree_model import train_decision_tree_model
@@ -26,22 +28,6 @@ import seaborn as sns
 import os
 import pandas as pd
 
-
-def plot_roc_curve(y_true, y_scores, label: str):
-    fpr, tpr, _ = roc_curve(y_true, y_scores)
-    auc_value = roc_auc_score(y_true, y_scores)
-
-    plt.figure()
-    plt.plot(fpr, tpr, label=f"{label} (AUC = {auc_value:.3f})")
-    plt.plot([0, 1], [0, 1], linestyle="--")
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title(f"ROC Curve - {label}")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
-    return auc_value
 
 def main() -> None:
 
