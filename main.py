@@ -1,28 +1,51 @@
-from src.data.load_data import load_dataset
+from src.data.load_data import load_dataset,  load_train_test
 from src.data.preprocess import clean_dataset
-from src.visualization.eda import plot_eda
-from src.models.train_model import split_data, plot_roc_curve
-from src.models.knn_model import train_knn_model
-from src.models.dumb_model import train_dumb_model
-from src.visualization.performance import (
-    plot_confusion_matrices,
-    plot_performance_comparison,
-    
+
+from src.visualization.eda import (
     churn_distribution,
     numeric_histograms,
     categorical_churn,
-    correlation_heatmap
+    correlation_heatmap,
 )
-from sklearn.metrics import confusion_matrix
+
+from src.models.knn_model import train_knn_model
+from src.models.dumb_model import train_dumb_model
+from src.models.decisionTree_model import train_decision_tree_model
+from src.models.randomForestClassifer_model import train_random_forest_model
+
+from src.visualization.performance import (
+    plot_confusion_matrices,
+    plot_performance_comparison,
+)
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score, roc_curve
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import pandas as pd
 
 
+def plot_roc_curve(y_true, y_scores, label: str):
+    fpr, tpr, _ = roc_curve(y_true, y_scores)
+    auc_value = roc_auc_score(y_true, y_scores)
+
+    plt.figure()
+    plt.plot(fpr, tpr, label=f"{label} (AUC = {auc_value:.3f})")
+    plt.plot([0, 1], [0, 1], linestyle="--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(f"ROC Curve - {label}")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    return auc_value
+
 def main() -> None:
 
-    print("---Loading data...")
+    print("Loading data")
     #raw_df = load_dataset("data/raw/card_transdata.csv")
     train_raw, test_raw = load_train_test(
         "data/raw/train.csv",
@@ -32,16 +55,17 @@ def main() -> None:
     # Print shape of the raw dataset
     print(f"Raw dataset shape: {train_raw.shape}")
 
-    print("---Cleaning data...")
+    print("Cleaning data")
     train_clean, test_clean = clean_dataset(train_raw, test_raw)
 
     print(f"Cleaned dataset shape: {train_clean.shape}")
 
+    os.makedirs("data/processed", exist_ok=True)
     train_clean.to_csv("data/processed/train_clean.csv", index=False)
     test_clean.to_csv("data/processed/test_clean.csv", index=False)
 
-    print("---Creating EDA visuals...")
-    plot_eda(train_clean)
+    print("Creating EDA visuals")
+    #plot_eda(train_clean)
 
     # EDA
     churn_distribution(train_clean)
@@ -49,49 +73,95 @@ def main() -> None:
     categorical_churn(train_clean)
     correlation_heatmap(train_clean)
 
-    print("---Splitting data...")
-    X_train, X_val, X_test, y_train, y_val, y_test = split_data(clean_train_df)
+    print("Splitting data")
+    feature_cols = [
+        "Contract Length",
+        "Subscription Type",
+        "Gender",
+        "Total Spend",
+        "Support Calls",
+        "Usage Frequency",
+        "Age",
+        "Last Interaction",
+        "Tenure",
+        "Payment Delay",
+    ]
+
+    X = train_clean[feature_cols].copy()
+    y = train_clean["Churn"]
+    X_train, X_val, X_test, y_train, y_val, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=1234,
+        stratify=y,
+    )
 
 
-
-
-#stopped here
-    print("---Training models...")
+    print("Training models")
     knn_model = train_knn_model(X_train, y_train)
     dumb_model = train_dumb_model(X_train, y_train)
+    tree_model = train_decision_tree_model(X_train, y_train)
+    rf_model = train_random_forest_model(X_train, y_train)
 
-    print("---Evaluating on validation set...")
+    print("Evaluating on validation set")
+    # class predictions
     y_val_pred_knn = knn_model.predict(X_val)
     y_val_pred_dumb = dumb_model.predict(X_val)
+    y_val_pred_tree = tree_model.predict(X_val)
+    y_val_pred_rf = rf_model.predict(X_val)
 
+    #probabilities
     val_prob_knn = knn_model.predict_proba(X_val)[:, 1]
     val_prob_dumb = dumb_model.predict_proba(X_val)[:, 1]
+    val_prob_tree = tree_model.predict_proba(X_val)[:, 1]
+    val_prob_rf = rf_model.predict_proba(X_val)[:, 1]
 
     plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn)
     plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
 
-    auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Never Fraud")
-    auc_knn = plot_roc_curve(y_val, val_prob_knn, "3-NN")
+    auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn")
+    auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN")
 
-    best_model = knn_model if auc_knn >= auc_dumb else dumb_model
-    best_label = "3-NN" if best_model is knn_model else "Never Fraud"
+    auc_tree = roc_auc_score(y_val, val_prob_tree)
+    auc_rf = roc_auc_score(y_val, val_prob_rf)
 
-    print(f"---Testing best model ({best_label})...")
-    y_test_pred = best_model.predict(X_test)
+    print("Validation AUC - Predict No Churn:")
+    print(auc_dumb)
+    print("Validation AUC - KNN:")
+    print(auc_knn)
+    print("Validation AUC - Decision Tree:")
+    print(auc_tree)
+    print("Validation AUC - Random Forest:")
+    print(auc_rf)
+
+    # pick best model 
+    models = [
+        ("Predict No Churn", dumb_model, auc_dumb),
+        ("k-NN", knn_model, auc_knn),
+        ("Decision Tree", tree_model, auc_tree),
+        ("Random Forest", rf_model, auc_rf),
+    ]
+    best_label, best_model, best_auc = max(models, key=lambda t: t[2])
+
+    print("Best model on validation set:")
+    print(best_label)
+    print(best_auc)
+
+    print("Generating test predictions with best model...")
+    X_test = test_clean[feature_cols].copy()
     test_prob = best_model.predict_proba(X_test)[:, 1]
-    plot_roc_curve(y_test, test_prob, f"Test {best_label}")
 
-    cm = confusion_matrix(y_test, y_test_pred)
-    plt.figure()
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    plt.title("Best Model Confusion Matrix")
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.tight_layout()
-    plt.show()
-
+    os.makedirs("data/submissions", exist_ok=True)
+    submission = pd.DataFrame(
+        {
+            "CustomerID": test_clean["CustomerID"],
+            "Churn": test_prob,
+        }
+    )
+    submission.to_csv("data/submissions/best_model_submission.csv", index=False)
+    print("Wrote best_model_submission to a csv")
     print("Done.")
 
-#st here
 if __name__ == "__main__":
     main()

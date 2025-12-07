@@ -6,7 +6,12 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import make_column_transformer
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import (
+    roc_auc_score,
+    accuracy_score,
+    f1_score,
+    confusion_matrix,
+)
 
 CATEGORICAL_COLS = [
     "Contract Length",
@@ -67,10 +72,18 @@ if __name__ == "__main__":
 
     #validate
     val_pred_proba = knn_model.predict_proba(X_val)[:, 1]
-    auc_knn = roc_auc_score(y_val, val_pred_proba)
+    val_pred_class = knn_model.predict(X_val)
 
-    print("KNN validation AUC:")
-    print(auc_knn)
+    accuracy = accuracy_score(y_val, val_pred_class)
+    f1 = f1_score(y_val, val_pred_class)
+    auc_knn = roc_auc_score(y_val, val_pred_proba)
+    conf_matrix = confusion_matrix(y_val, val_pred_class)
+
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"F1-score: {f1:.4f}")
+    print(f"ROC AUC: {auc_knn:.4f}")
+    print("Confusion Matrix:")
+    print(conf_matrix)
 
     #predict
     X_test = test[BASELINE_FEATURES]

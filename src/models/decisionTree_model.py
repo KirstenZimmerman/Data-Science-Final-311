@@ -5,7 +5,12 @@ from sklearn.compose import make_column_transformer
 from sklearn.pipeline import make_pipeline
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import (
+    roc_auc_score,
+    accuracy_score,
+    f1_score,
+    confusion_matrix,
+)
 
 CATEGORICAL_COLS = ["Contract Length", "Subscription Type", "Gender"]
 NUMERIC_COLS = [
@@ -64,10 +69,18 @@ if __name__ == "__main__":
     tree_model = train_decision_tree_model(X_train, y_train)
 
     val_pred_proba = tree_model.predict_proba(X_val)[:, 1]
+    val_pred_class = tree_model.predict(X_val)
     auc_tree = roc_auc_score(y_val, val_pred_proba)
 
-    print("Decision tree validation AUC:")
-    print(auc_tree)
+    accuracy = accuracy_score(y_val, val_pred_class)
+    f1 = f1_score(y_val, val_pred_class)
+    conf_matrix = confusion_matrix(y_val, val_pred_class)
+
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"F1-score: {f1:.4f}")
+    print(f"ROC AUC: {auc_tree:.4f}")
+    print("Confusion Matrix:")
+    print(conf_matrix)
 
     X_test = test[BASELINE_FEATURES]
     test_pred_tree = tree_model.predict_proba(X_test)[:, 1]
