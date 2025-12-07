@@ -28,38 +28,29 @@ This project can be used both to fulfill course requirements and as a well-organ
 
 └── src/
     ├── data/
-    │   ├── load_data.py        # Loads raw data into pandas DataFrames
-    │   ├── clean_data.py       # Handles missing values, type conversion, and feature creation
-    │   └── split_data.py       # Train/validation split utilities
-
-    ├── features/
-    │   └── build_features.py   # Constructs feature lists, encoders, and transformers
+    │   ├── load_data.py # Load raw train/test CSVs
+    │   ├── preprocess.py # Data cleaning, imputation, type conversion
+    │   └── split_data.py # train/validation split utilities
 
     ├── models/
-    │   ├── baseline.py         # Custom baseline churn classifier
-    │   ├── knn_model.py        # KNN model pipeline
-    │   ├── decision_tree.py    # Optimized DecisionTreeClassifier    
-    │   └── random_forest.py    
-
+    │   ├── dumb_model.py # Truly dumb baseline (predicts no churn)
+    │   ├── knn_model.py # KNN pipeline (OneHot + scaling)
+    │   ├── decisionTree_model.py # Tuned Decision Tree pipeline
+    │   └── randomForestClassifier_model.py # Random Forest pipeline
 
     ├── utils/
-    │   └── helpers.py         
+    │   └── helper_functions.py # ROC curve plotting and shared helpers
 
     └── visualization/
-        ├── eda.py              # plots for distributions, correlations, class balance
-        └── performance.py      # Confusion matrices, ROC curves, and model comparison
+        ├── eda.py # Exploratory data analysis plots
+        └── performance.py # Confusion matrices & metric comparison
 ```
 
 # Models Implemented
-1. Baseline Classifier (Custom Rule-Based Model) - A model using insights from EDA, incorporating features like:
-    - Contract Length
-    - Total Spend
-    - Support Calls
-    - Tenure
-    - Age
-    - Usage Frequency
-    - Last Interaction
-Used to establish a minimum performance benchmark.
+1. Dumb Baseline (Predict No Churn)
+    - Implemented using `DummyClassifier(strategy="constant", constant=0)`
+   - Always predicts “no churn”
+   - Serves as a true lower-bound benchmark, matching the course baseline
 
 2. K-Nearest Neighbors (KNN)
     - StandardScaler for numeric features
