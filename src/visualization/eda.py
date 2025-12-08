@@ -2,9 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def churn_distribution(df: pd.DataFrame) -> None:
-    """Show overall churn class distribution."""
 
+def churn_distribution(df: pd.DataFrame) -> None:
+    """Plot overall churn class distribution and print normalized rates."""
     sns.countplot(x="Churn", data=df)
     plt.title("Churn Distribution")
     plt.xlabel("Churn (0 = No, 1 = Yes)")
@@ -12,45 +12,96 @@ def churn_distribution(df: pd.DataFrame) -> None:
     plt.tight_layout()
     plt.show()
 
-    # Also print normalized counts for quick reference
-    print("Churn proportion:")
+    print("Churn rate (normalized):")
     print(df["Churn"].value_counts(normalize=True))
+    print()
 
 
 def numeric_histograms(df: pd.DataFrame) -> None:
     """
-    Show overall numeric distributions, plus special views for
-    variables where 0 means 'no activity'.
+    Show numeric feature distributions and churn-related numeric views:
+    - overall histograms for all numeric columns
+    - non-zero distributions for Support Calls and Last Interaction
+    - boxplots of each numeric feature by churn
+    - line plots of selected numeric features by churn
+    - special binned line plot for Total Spend by churn
     """
-
+    # All numeric columns (including nullable Int64)
     numeric_cols = df.select_dtypes(include=["int64", "float64", "Int64"]).columns
 
-    # Overall numeric histograms
+    # 1) Overall distributions
     df[numeric_cols].hist(figsize=(15, 12), bins=30)
     plt.tight_layout()
     plt.show()
 
-    # Non-zero distributions for variables where 0 = no activity
+    # 2) Non-zero distributions for Support Calls and Last Interaction
     for col in ["Support Calls", "Last Interaction"]:
+        if col in df.columns:
+            plt.figure(figsize=(6, 4))
+            sns.histplot(df[df[col] > 0][col], bins=30)
+            plt.title(f"{col} (Non-zero Distribution)")
+            plt.xlabel(col)
+            plt.tight_layout()
+            plt.show()
+
+    # 3) Boxplots of each numeric feature by churn
+    for col in numeric_cols:
+        if col == "Churn":
+            continue
+        plt.figure(figsize=(6, 4))
+        sns.boxplot(x="Churn", y=col, data=df)
+        plt.title(f"{col} vs Churn")
+        plt.xlabel("Churn (0 = No, 1 = Yes)")
+        plt.ylabel(col)
+        plt.tight_layout()
+        plt.show()
+
+    # 4) Line plots of selected numeric features by churn
+    other_cols = [
+        "Age",
+        "Tenure",
+        "Usage Frequency",
+        "Support Calls",
+        "Payment Delay",
+        "Last Interaction",
+    ]
+
+    for col in other_cols:
         if col not in df.columns:
             continue
 
         plt.figure(figsize=(6, 4))
-        sns.histplot(df[df[col] > 0][col], bins=30)
-        plt.title(f"{col} (Non-zero Distribution)")
+
+        grouped = (
+            df.groupby([col, "Churn"])
+            .size()
+            .reset_index(name="count")
+        )
+
+        for churn_value, color, label in [(0, "green", "No Churn"), (1, "red", "Churn")]:
+            subset = grouped[grouped["Churn"] == churn_value]
+            plt.plot(
+                subset[col],
+                subset["count"],
+                color=color,
+                label=label,
+            )
+
+        plt.title(f"{col} by Churn")
         plt.xlabel(col)
         plt.ylabel("Count")
+        plt.legend()
         plt.tight_layout()
         plt.show()
 
-    # Highlight Total Spend by churn as a 1D profile
-    if "Total Spend" in df.columns and "Churn" in df.columns:
+    # 5) Special: Total Spend by churn with binned x-axis
+    if "Total Spend" in df.columns:
         bins = pd.cut(df["Total Spend"], bins=30)
 
         grouped = (
             df.groupby([bins, "Churn"])
-              .size()
-              .unstack(fill_value=0)
+            .size()
+            .unstack(fill_value=0)
         )
 
         x = [interval.mid for interval in grouped.index]
@@ -71,10 +122,8 @@ def numeric_histograms(df: pd.DataFrame) -> None:
 
 def categorical_churn(df: pd.DataFrame) -> None:
     """
-    For each categorical feature, show counts of churn vs no churn
-    with color-coded bars.
+    For each categorical feature, show countplot with bars color-coded by churn.
     """
-
     categorical_cols = df.select_dtypes(include="object").columns
 
     for col in categorical_cols:
@@ -92,20 +141,6 @@ def categorical_churn(df: pd.DataFrame) -> None:
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.show()
-
-
-def correlation_heatmap(df: pd.DataFrame) -> None:
-    """Correlation heatmap for numeric features (including Churn)."""
-
-    numeric_cols = df.select_dtypes(include=["int64", "float64", "Int64"]).columns
-    corr = df[numeric_cols].corr()
-
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(corr, cmap="coolwarm")
-    plt.title("Correlation Heatmap")
-    plt.tight_layout()
-    plt.show()
-
 
 if __name__ == "__main__":
     df = pd.read_csv("data/processed/train_clean.csv")
