@@ -1,14 +1,12 @@
 # Customer Churn Prediction – MAT 311 Final Project
 
-This repository contains my end-to-end machine learning workflow for predicting customer churn as part of the MAT 311: Introduction to Data Science final project. The goal is to prepare the dataset, explore key patterns, engineer features, build multiple predictive models, and generate a submission for a Kaggle competition evaluated using ROC AUC.
+This repository contains my machine learning workflow for predicting customer churn as part of the MAT 311: Introduction to Data Science final project. The goal is to prepare the dataset, explore key patterns, engineer features, build multiple predictive models, and generate a submission for a Kaggle competition.
 
 ## Purpose
 
-The project follows a production-style organizational structure modeled after industry best practices and the course guidelines. Each step—data loading, cleaning, feature engineering, modeling, evaluation, and prediction—is separated into modular scripts under src/ for clear reproducibility.
+This project follows a production-style structure where each stage of the machine learning workflow is implemented using reusable scripts within the src/ directory to ensure clarity and reproducibility.
 
-Jupyter notebooks serve only for EDA and experimentation, while main.py runs the complete pipeline.
-
-This project can be used both to fulfill course requirements and as a well-organized portfolio example demonstrating end-to-end machine learning workflow skills
+Jupyter notebooks are used only for exploratory data analysis and experimentation, while main.py runs the complete pipeline from raw data to model evaluation and final predictions. This design makes it easy to rerun the entire workflow from the command line.
 
 ## Project layout
 
