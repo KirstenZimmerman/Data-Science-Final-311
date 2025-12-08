@@ -57,7 +57,6 @@ def main() -> None:
     churn_distribution(train_clean)
     numeric_histograms(train_clean)
     categorical_churn(train_clean)
-    correlation_heatmap(train_clean)
 
     print("Splitting data")
     feature_cols = [

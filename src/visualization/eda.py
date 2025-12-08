@@ -147,4 +147,4 @@ if __name__ == "__main__":
     churn_distribution(df)
     numeric_histograms(df)
     categorical_churn(df)
-    correlation_heatmap(df)
+   
