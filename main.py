@@ -12,7 +12,7 @@ from src.utils.helper_functions import plot_roc_curve
 from src.models.knn_model import train_knn_model
 from src.models.dumb_model import train_dumb_model
 from src.models.decisionTree_model import train_decision_tree_model
-from models.randomForestClassifier_model import train_random_forest_model
+from src.models.randomForestClassifier_model import train_random_forest_model
 
 from src.visualization.performance import (
     plot_confusion_matrices,
