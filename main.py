@@ -80,7 +80,6 @@ def main() -> None:
         stratify=y,
     )
 
-
     print("Training models")
     knn_model = train_knn_model(X_train, y_train)
     dumb_model = train_dumb_model(X_train, y_train)
@@ -101,16 +100,15 @@ def main() -> None:
     val_prob_rf = rf_model.predict_proba(X_val)[:, 1]
 
     plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn)
-    plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
+    #plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
     
     plot_confusion_matrices(y_val, y_val_pred_tree, y_val_pred_rf)
-    plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf)
+    #plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf)
 
     auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn")
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN")
     auc_tree = plot_roc_curve(y_val, val_prob_tree, "Decision Tree")
     auc_rf = plot_roc_curve(y_val, val_prob_rf, "Random Forest Classifier")
-
 
     auc_dumb = roc_auc_score(y_val, val_prob_dumb)
     auc_knn = roc_auc_score(y_val, val_prob_knn)
