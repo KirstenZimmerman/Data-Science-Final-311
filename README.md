@@ -72,7 +72,19 @@ This project can be used both to fulfill course requirements and as a well-organ
         - min_samples_leaf
 
 
-# Notes
-- "Payment Delay" was removed from modeling because it creates data leakage.
-- Missing values were filled using a combination of median and zeros.
-- All models are wrapped in full scikit-learn pipelines for reproducibility.
+## Running the project
+
+Install the dependencies and run the pipeline.
+
+The dependecies are: numpy, pandas, scikit-learn, matplotlib, and seaborn
+
+You should use the versions of the dependencies as specified by the requirements file:
+
+```bash
+conda create -n final_project --file requirements.txt
+conda activate final_project
+python main.py
+```
+Once you do this the dataset will be loaded in and prepocesd. First, the EDA will be displayed. After this, the feautures will be builts, my data split into training and validation sets, and my three models will be trained: my eda model, my knn model, and my decision tree model. After this, the rsults of the mdoels will be visualized including their confusion matrix, four meausring metrics for models, and their ROC-AUC curve. After this, the ROC-AUC curve and its confusion matrix of the best model will be shown.
+
+The cleaned data will be written to `data/processed/` and all plots will be displayed interactively.
