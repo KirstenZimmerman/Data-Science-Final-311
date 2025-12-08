@@ -5,7 +5,6 @@ from src.visualization.eda import (
     churn_distribution,
     numeric_histograms,
     categorical_churn,
-    correlation_heatmap,
 )
 
 from src.utils.helper_functions import plot_roc_curve
