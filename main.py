@@ -1,4 +1,4 @@
-from src.data.load_data import load_dataset,  load_train_test
+from src.data.load_data import load_train_test
 from src.data.preprocess import clean_dataset
 
 from src.visualization.eda import (
@@ -12,7 +12,7 @@ from src.utils.helper_functions import plot_roc_curve
 from src.models.knn_model import train_knn_model
 from src.models.dumb_model import train_dumb_model
 from src.models.decisionTree_model import train_decision_tree_model
-from src.models.randomForestClassifer_model import train_random_forest_model
+from models.randomForestClassifier_model import train_random_forest_model
 
 from src.visualization.performance import (
     plot_confusion_matrices,
@@ -31,7 +31,6 @@ import pandas as pd
 def main() -> None:
 
     print("Loading data")
-    #raw_df = load_dataset("data/raw/card_transdata.csv")
     train_raw, test_raw = load_train_test(
         "data/raw/train.csv",
         "data/raw/test.csv",
@@ -103,10 +102,18 @@ def main() -> None:
 
     plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn)
     plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
+    
+    plot_confusion_matrices(y_val, y_val_pred_knn, val_prob_tree)
+    plot_performance_comparison(y_val, val_prob_tree, val_prob_rf)
 
     auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn")
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN")
+    auc_tree = plot_roc_curve(y_val, val_prob_tree, "Decision Tree")
+    auc_rf = plot_roc_curve(y_val, val_prob_rf, "Random Forest Classifier")
 
+
+    auc_dumb = roc_auc_score(y_val, val_prob_dumb)
+    auc_knn = roc_auc_score(y_val, val_prob_knn)
     auc_tree = roc_auc_score(y_val, val_prob_tree)
     auc_rf = roc_auc_score(y_val, val_prob_rf)
 
