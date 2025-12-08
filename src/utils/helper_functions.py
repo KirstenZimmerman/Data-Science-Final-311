@@ -1,13 +1,3 @@
-# """Utility helpers for the project."""
-
-
-# def main() -> None:
-#     pass
-
-
-# if __name__ == "__main__":
-#     main()
-
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, roc_auc_score
 
