@@ -84,8 +84,6 @@ def main() -> None:
     )
 
     print("Training models")
-    y_val_pred_dumb = baseline_predict(X_val)
-    val_prob_dumb = y_val_pred_dumb
     knn_model = train_knn_model(X_train, y_train)
     tree_model = train_decision_tree_model(X_train, y_train)
     rf_model = train_random_forest_model(X_train, y_train)
@@ -122,7 +120,6 @@ def main() -> None:
 
     # pick best model 
     models = [
-        ("Baseline", None, auc_dumb),
         ("k-NN", knn_model, auc_knn),
         ("Decision Tree", tree_model, auc_tree),
         ("Random Forest", rf_model, auc_rf),
