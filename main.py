@@ -118,9 +118,9 @@ def main() -> None:
     auc_tree = plot_roc_curve(y_val, val_prob_tree, "Decision Tree")
     auc_rf = plot_roc_curve(y_val, val_prob_rf, "Random Forest Classifier")
 
-    auc_dumb = roc_auc_score(y_val, val_prob_dumb, "Predict No Churn", show=False)
-    auc_knn = roc_auc_score(y_val, val_prob_knn, "k-NN", show=False)
-    auc_tree = roc_auc_score(y_val, val_prob_tree, "Decision Tree", show=False)
+    auc_dumb = roc_auc_score(y_val, val_prob_dumb, "Predict No Churn")
+    auc_knn = roc_auc_score(y_val, val_prob_knn, "k-NN")
+    auc_tree = roc_auc_score(y_val, val_prob_tree, "Decision Tree")
     auc_rf = roc_auc_score(y_val, val_prob_rf, "Random Forest", show=True)
 
     print("Validation AUC - Predict No Churn:")
