@@ -24,33 +24,6 @@ def plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn, model1_name: st
     plt.tight_layout()
     plt.show()
 
-def plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn, model1_name: str, model2_name: str,) -> None:
-    """ Create a bar chart comparing model metrics. """
-
-    metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
-
-    baseline_scores = [
-        accuracy_score(y_test, y_pred_baseline),
-        precision_score(y_test, y_pred_baseline, zero_division=0),
-        recall_score(y_test, y_pred_baseline),
-        f1_score(y_test, y_pred_baseline),
-    ]
-
-    knn_scores = [
-        accuracy_score(y_test, y_pred_knn),
-        precision_score(y_test, y_pred_knn, zero_division=0),
-        recall_score(y_test, y_pred_knn),
-        f1_score(y_test, y_pred_knn),
-    ]
-
-    df = pd.DataFrame({'Metric': metrics, model1_name: knn_scores, model2_name: baseline_scores})
-
-    df.plot(x='Metric', kind='bar', figsize=(8, 5))
-    plt.ylim(0, 1)
-    plt.title('Model Performance Comparison')
-    plt.tight_layout()
-    plt.show()
-
 if __name__ == "__main__":
     from src.data.load_data import load_train_test
     from src.data.preprocess import clean_dataset
@@ -66,4 +39,3 @@ if __name__ == "__main__":
     y_test, y_pred_baseline, y_pred_knn = train_models(train_clean)
   
     plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn)
-    plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn)

@@ -14,10 +14,7 @@ from src.models.dumb_model import train_dumb_model
 from src.models.decisionTree_model import train_decision_tree_model
 from src.models.randomForestClassifier_model import train_random_forest_model
 
-from src.visualization.performance import (
-    plot_confusion_matrices,
-    plot_performance_comparison,
-)
+from src.visualization.performance import plot_confusion_matrices
 
 from sklearn.model_selection import train_test_split
 
@@ -106,11 +103,8 @@ def main() -> None:
     val_prob_tree = tree_model.predict_proba(X_val)[:, 1]
     val_prob_rf = rf_model.predict_proba(X_val)[:, 1]
 
-    plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Predict No Churn", model2_name="k-NN",)
-    plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Predict No Churn", model2_name="k-NN",)
-    
+    plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Predict No Churn", model2_name="k-NN",)    
     plot_confusion_matrices(y_val, y_val_pred_tree, y_val_pred_rf, model1_name="Decision Tree", model2_name="Random Forest")
-    plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf, model1_name="Decision Tree", model2_name="Random Forest")
 
     auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn", show=False)
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN", show=False)

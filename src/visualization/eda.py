@@ -37,18 +37,6 @@ def numeric_histograms(df: pd.DataFrame) -> None:
             plt.tight_layout()
             plt.show()
 
-    #Boxplots of each numeric feature by churn
-    for col in numeric_cols:
-        if col == "Churn":
-            continue
-        plt.figure(figsize=(6, 4))
-        sns.boxplot(x="Churn", y=col, data=df)
-        plt.title(f"{col} vs Churn")
-        plt.xlabel("Churn (0 = No, 1 = Yes)")
-        plt.ylabel(col)
-        plt.tight_layout()
-        plt.show()
-
     #Line plots of selected numeric features by churn
     other_cols = [
         "Age",
