@@ -10,7 +10,7 @@ from src.visualization.eda import (
 from src.utils.helper_functions import plot_roc_curve
 
 from src.models.knn_model import train_knn_model
-from src.models.dumb_model import smart_baseline_predict 
+from src.models.dumb_model import baseline_predict 
 from src.models.decisionTree_model import train_decision_tree_model
 from src.models.randomForestClassifier_model import train_random_forest_model
 
@@ -84,33 +84,34 @@ def main() -> None:
     )
 
     print("Training models")
+    y_val_pred_dumb = baseline_predict(X_val)
+    val_prob_dumb = y_val_pred_dumb
     knn_model = train_knn_model(X_train, y_train)
-    dumb_model = smart_baseline_predict(X_train, y_train)
     tree_model = train_decision_tree_model(X_train, y_train)
     rf_model = train_random_forest_model(X_train, y_train)
 
     print("Evaluating on validation set")
     #class predictions
     y_val_pred_knn = knn_model.predict(X_val)
-    y_val_pred_dumb = dumb_model.predict(X_val)
+    y_val_pred_dumb = baseline_predict(X_val)
     y_val_pred_tree = tree_model.predict(X_val)
     y_val_pred_rf = rf_model.predict(X_val)
 
     #probabilities
     val_prob_knn = knn_model.predict_proba(X_val)[:, 1]
-    val_prob_dumb = dumb_model.predict_proba(X_val)[:, 1]
+    val_prob_dumb = y_val_pred_dumb
     val_prob_tree = tree_model.predict_proba(X_val)[:, 1]
     val_prob_rf = rf_model.predict_proba(X_val)[:, 1]
 
-    plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Predict No Churn", model2_name="k-NN",)    
+    plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Baseline", model2_name="k-NN",)    
     plot_confusion_matrices(y_val, y_val_pred_tree, y_val_pred_rf, model1_name="Decision Tree", model2_name="Random Forest")
 
-    auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn", show=False)
+    auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Baseline", show=False)
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN", show=False)
     auc_tree = plot_roc_curve(y_val, val_prob_tree, "Decision Tree", show=False)
     auc_rf = plot_roc_curve(y_val, val_prob_rf, "Random Forest Classifier", show=True)
 
-    print("Validation AUC - Predict No Churn:")
+    print("Validation AUC - Baseline:")
     print(auc_dumb)
     print("Validation AUC - KNN:")
     print(auc_knn)
@@ -121,7 +122,7 @@ def main() -> None:
 
     # pick best model 
     models = [
-        ("Predict No Churn", dumb_model, auc_dumb),
+        ("Baseline", None, auc_dumb),
         ("k-NN", knn_model, auc_knn),
         ("Decision Tree", tree_model, auc_tree),
         ("Random Forest", rf_model, auc_rf),

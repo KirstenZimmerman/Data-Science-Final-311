@@ -16,7 +16,7 @@ SMART_BASELINE_FEATURES = [
 ]
 
 
-def smart_baseline_predict(df: pd.DataFrame) -> pd.Series:
+def baseline_predict(df: pd.DataFrame) -> pd.Series:
     """
     Vectorized rule-based churn prediction on a DataFrame.
     """
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     test = pd.read_csv("data/processed/test_clean.csv")
    
     y_true = train["Churn"]
-    y_pred = smart_baseline_predict(train)
+    y_pred = baseline_predict(train)
 
     acc  = accuracy_score(y_true, y_pred)
     f1   = f1_score(y_true, y_pred)
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     print("Confusion matrix:")
     print(conf)
 
-    test_pred = smart_baseline_predict(test)
+    test_pred = baseline_predict(test)
 
     os.makedirs("data/submissions", exist_ok=True)
     submission = pd.DataFrame({
