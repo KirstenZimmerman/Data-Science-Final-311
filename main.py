@@ -100,10 +100,10 @@ def main() -> None:
     val_prob_rf = rf_model.predict_proba(X_val)[:, 1]
 
     plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn)
-    #plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
+    plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
     
     plot_confusion_matrices(y_val, y_val_pred_tree, y_val_pred_rf)
-    #plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf)
+    plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf)
 
     auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn")
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN")

@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 
-def plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn) -> None:
+def plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn, model1_name: str, model2_name: str,) -> None:
     """Plot confusion matrices for both models."""
     conf_baseline = confusion_matrix(y_test, y_pred_baseline)
     conf_knn = confusion_matrix(y_test, y_pred_knn)
@@ -11,19 +11,19 @@ def plot_confusion_matrices(y_test, y_pred_baseline, y_pred_knn) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
 
     sns.heatmap(conf_baseline, annot=True, fmt='d', cmap='Reds', ax=axes[0])
-    axes[0].set_title('Predict No Churn')
+    axes[0].set_title(model1_name)
     axes[0].set_xlabel("Predicted")
     axes[0].set_ylabel("Actual")
 
     sns.heatmap(conf_knn, annot=True, fmt='d', cmap='Blues', ax=axes[1])
-    axes[1].set_title('k-NN')
+    axes[1].set_title(model2_name)
     axes[1].set_xlabel("Predicted")
     axes[1].set_ylabel("Actual")
 
     plt.tight_layout()
     plt.show()
 
-def plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn) -> None:
+def plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn, model1_name: str, model2_name: str,) -> None:
     """Create a bar chart comparing model metrics."""
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
 
@@ -41,7 +41,7 @@ def plot_performance_comparison(y_test, y_pred_baseline, y_pred_knn) -> None:
         f1_score(y_test, y_pred_knn),
     ]
 
-    df = pd.DataFrame({'Metric': metrics, 'k-NN': knn_scores, 'Predict No Churn': baseline_scores})
+    df = pd.DataFrame({'Metric': metrics, model1_name: knn_scores, model2_name: baseline_scores})
 
     df.plot(x='Metric', kind='bar', figsize=(8, 5))
     plt.ylim(0, 1)
