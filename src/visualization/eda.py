@@ -2,9 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-
 def churn_distribution(df: pd.DataFrame) -> None:
-    """Plot overall churn class distribution and print normalized rates."""
+    """ Plot overall churn class distribution and print normalized rates. """
+
     sns.countplot(x="Churn", data=df)
     plt.title("Churn Distribution")
     plt.xlabel("Churn (0 = No, 1 = Yes)")
@@ -16,25 +16,18 @@ def churn_distribution(df: pd.DataFrame) -> None:
     print(df["Churn"].value_counts(normalize=True))
     print()
 
-
 def numeric_histograms(df: pd.DataFrame) -> None:
-    """
-    Show numeric feature distributions and churn-related numeric views:
-    - overall histograms for all numeric columns
-    - non-zero distributions for Support Calls and Last Interaction
-    - boxplots of each numeric feature by churn
-    - line plots of selected numeric features by churn
-    - special binned line plot for Total Spend by churn
-    """
-    # All numeric columns (including nullable Int64)
+    """ Visualize numeric feature distributions and their relationship to churn """
+
+    #All numeric columns
     numeric_cols = df.select_dtypes(include=["int64", "float64", "Int64"]).columns
 
-    # 1) Overall distributions
+    #Overall distributions
     df[numeric_cols].hist(figsize=(15, 12), bins=30)
     plt.tight_layout()
     plt.show()
 
-    # 2) Non-zero distributions for Support Calls and Last Interaction
+    #Non-zero distributions for Support Calls and Last Interaction
     for col in ["Support Calls", "Last Interaction"]:
         if col in df.columns:
             plt.figure(figsize=(6, 4))
@@ -44,7 +37,7 @@ def numeric_histograms(df: pd.DataFrame) -> None:
             plt.tight_layout()
             plt.show()
 
-    # 3) Boxplots of each numeric feature by churn
+    #Boxplots of each numeric feature by churn
     for col in numeric_cols:
         if col == "Churn":
             continue
@@ -56,7 +49,7 @@ def numeric_histograms(df: pd.DataFrame) -> None:
         plt.tight_layout()
         plt.show()
 
-    # 4) Line plots of selected numeric features by churn
+    #Line plots of selected numeric features by churn
     other_cols = [
         "Age",
         "Tenure",
@@ -94,7 +87,7 @@ def numeric_histograms(df: pd.DataFrame) -> None:
         plt.tight_layout()
         plt.show()
 
-    # 5) Special: Total Spend by churn with binned x-axis
+    #Total Spend by churn with binned x-axis
     if "Total Spend" in df.columns:
         bins = pd.cut(df["Total Spend"], bins=30)
 
@@ -119,13 +112,10 @@ def numeric_histograms(df: pd.DataFrame) -> None:
         plt.tight_layout()
         plt.show()
 
-
 def categorical_churn(df: pd.DataFrame) -> None:
-    """
-    For each categorical feature, show countplot with bars color-coded by churn.
-    """
+    """ For each categorical feature, show countplot with bars color-coded by churn. """
+    
     categorical_cols = df.select_dtypes(include="object").columns
-
     for col in categorical_cols:
         plt.figure(figsize=(6, 4))
         sns.countplot(

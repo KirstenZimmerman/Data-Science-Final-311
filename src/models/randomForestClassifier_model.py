@@ -1,3 +1,10 @@
+"""
+Random Forest model for customer churn prediction.
+This module defines a preprocessing + RandomForestClassifier pipeline,
+provides a training function for use in main.py, and allows standalone
+execution to evaluate performance and generate a Kaggle-ready submission.
+"""
+
 import os
 import pandas as pd
 
@@ -26,6 +33,8 @@ NUMERIC_COLS = [
 RF_FEATURES = CATEGORICAL_COLS + NUMERIC_COLS
 
 def build_rf_pipeline():
+    """ Build and return a preprocessing + Random Forest pipeline. """
+
     preprocessor = make_column_transformer(
         (OneHotEncoder(handle_unknown="ignore", sparse_output=False), CATEGORICAL_COLS),
         remainder="passthrough",
@@ -41,6 +50,8 @@ def build_rf_pipeline():
     return pipeline
 
 def train_random_forest_model(X_train, y_train):
+    """ Train and return a Random Forest churn prediction model. """
+    
     model = build_rf_pipeline()
     model.fit(X_train, y_train)
     return model

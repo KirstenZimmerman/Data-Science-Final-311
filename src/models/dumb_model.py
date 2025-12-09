@@ -1,3 +1,10 @@
+"""
+Naive (dumb) baseline model for customer churn prediction.
+This module implements a DummyClassifier that always predicts no churn.
+It serves as a minimum-performance baseline for comparison against
+more complex machine learning models.
+"""
+
 import pandas as pd
 from sklearn.dummy import DummyClassifier
 import os
@@ -16,6 +23,8 @@ BASELINE_FEATURES = [
 ]
 
 def train_dumb_model(X_train, y_train):
+    """ Train and return a naive baseline model that always predicts no churn. """
+
     model = DummyClassifier(strategy="constant", constant=0)
     model.fit(X_train, y_train)
     return model
@@ -63,9 +72,3 @@ if __name__ == "__main__":
 
     submission.to_csv("data/submissions/dumb_baseline.csv", index=False)
     print("Wrote dumb_baseline to a csv")
-
-# def train_dumb_model(X_train: pd.DataFrame, y_train: pd.Series) -> DummyClassifier:
-#     """Train a model that always predicts the majority class (never fraud)."""
-#     model = DummyClassifier(strategy="constant", constant=0)
-#     model.fit(X_train, y_train)
-#     return model

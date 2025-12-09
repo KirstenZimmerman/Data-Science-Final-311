@@ -1,3 +1,10 @@
+"""
+K-Nearest Neighbors (KNN) model for customer churn prediction.
+This module defines a preprocessing + KNN pipeline, provides a training
+function for use in main.py, and supports standalone execution for
+evaluation and Kaggle submission generation.
+"""
+
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -31,6 +38,8 @@ NUMERIC_COLS = [
 BASELINE_FEATURES = CATEGORICAL_COLS + NUMERIC_COLS
 
 def build_knn_pipeline():
+    """ Build and return a preprocessing + KNN classification pipeline. """
+
     preprocessor = make_column_transformer(
         (OneHotEncoder(handle_unknown="ignore", sparse_output=False), CATEGORICAL_COLS),
         (StandardScaler(), NUMERIC_COLS),
@@ -46,6 +55,8 @@ def build_knn_pipeline():
     return pipeline
 
 def train_knn_model(X_train, y_train):
+    """ Train and return a KNN churn prediction model. """
+    
     model = build_knn_pipeline()
     model.fit(X_train, y_train)
     return model
@@ -98,10 +109,3 @@ if __name__ == "__main__":
 
     submission_knn.to_csv("data/submissions/knn_baseline_model.csv", index=False)
     print("Wrote knn_baseline_model to a csv")
-
-
-# def train_knn_model(X_train: pd.DataFrame, y_train: pd.Series) -> KNeighborsClassifier:
-#     """Train and return a 3-NN classifier."""
-#     model = KNeighborsClassifier(n_neighbors=3)
-#     model.fit(X_train, y_train)
-#     return model

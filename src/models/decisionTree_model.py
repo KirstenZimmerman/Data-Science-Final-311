@@ -1,3 +1,10 @@
+"""
+Decision Tree model for customer churn prediction.
+This module defines a preprocessing and modeling pipeline using
+one-hot encoding for categorical features and standard scaling for
+numeric features, followed by a tuned DecisionTreeClassifier.
+"""
+
 import os
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -25,6 +32,8 @@ NUMERIC_COLS = [
 BASELINE_FEATURES = CATEGORICAL_COLS + NUMERIC_COLS
 
 def build_tree_pipeline():
+    """ Build and return a preprocessing + decision tree modeling pipeline. """
+
     preprocessor = make_column_transformer(
         (OneHotEncoder(handle_unknown="ignore", sparse_output=False), CATEGORICAL_COLS),
         (StandardScaler(), NUMERIC_COLS),
@@ -41,6 +50,8 @@ def build_tree_pipeline():
     return pipeline
 
 def train_decision_tree_model(X_train, y_train):
+    """ Train and return a decision tree churn prediction model. """
+
     model = build_tree_pipeline()
     model.fit(X_train, y_train)
     return model

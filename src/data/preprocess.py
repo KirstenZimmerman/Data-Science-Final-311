@@ -1,27 +1,19 @@
+"""
+Data cleaning utilities for the customer churn dataset.
+Handles missing values, type conversion, and basic preprocessing
+for both training and test data.
+"""
+
 import os
 import numpy as np
 import pandas as pd
 from .load_data import load_dataset
 
-
-# def clean_dataset(df: pd.DataFrame) -> pd.DataFrame:
-#     """Clean the dataset by dropping rows with missing values."""
-#     return df.dropna().copy()
-
-
-# if __name__ == "__main__":
-#     # Load the raw dataset
-#     raw = load_dataset("data/raw/card_transdata.csv")
-#     # Clean the dataset
-#     cleaned = clean_dataset(raw)
-#     # Ensure the processed directory exists
-#     os.makedirs("data/processed", exist_ok=True)
-#     # Save the cleaned data
-#     processed_path = "data/processed/card_transdata_clean.csv"
-#     cleaned.to_csv(processed_path, index=False)
-#     print(f"Cleaned data saved to {processed_path}")
-
 def clean_dataset(train_df: pd.DataFrame, test_df: pd.DataFrame):
+    """
+    Clean and preprocess training and test datasets.
+    Returns cleaned copies with consistent types and filled values.
+    """
    
     train = train_df.copy()
     test = test_df.copy()
@@ -97,7 +89,6 @@ def clean_dataset(train_df: pd.DataFrame, test_df: pd.DataFrame):
 
     return train, test
 
-
 if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
 
@@ -107,8 +98,6 @@ if __name__ == "__main__":
     )
 
     train_clean, test_clean = clean_dataset(train_raw, test_raw)
-
     train_clean.to_csv("data/processed/train_clean.csv", index=False)
     test_clean.to_csv("data/processed/test_clean.csv", index=False)
-
     print("Saved cleaned datasets!")

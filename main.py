@@ -29,6 +29,14 @@ import pandas as pd
 
 
 def main() -> None:
+    """ 
+    Run the full customer churn prediction pipeline.
+    This function loads and cleans the data, generates EDA visualizations,
+    trains multiple models (baseline, KNN, decision tree, random forest),
+    evaluates them using confusion matrices and ROC/AUC metrics, selects the
+    best model based on validation performance, and writes a Kaggle-ready
+    submission file.
+    """
 
     print("Loading data")
     train_raw, test_raw = load_train_test(
@@ -99,21 +107,21 @@ def main() -> None:
     val_prob_tree = tree_model.predict_proba(X_val)[:, 1]
     val_prob_rf = rf_model.predict_proba(X_val)[:, 1]
 
-    plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn)
-    plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn)
+    plot_confusion_matrices(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Predict No Churn", model2_name="k-NN",)
+    plot_performance_comparison(y_val, y_val_pred_dumb, y_val_pred_knn, model1_name="Predict No Churn", model2_name="k-NN",)
     
-    plot_confusion_matrices(y_val, y_val_pred_tree, y_val_pred_rf)
-    plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf)
+    plot_confusion_matrices(y_val, y_val_pred_tree, y_val_pred_rf, model1_name="Predict No Churn", model2_name="k-NN")
+    plot_performance_comparison(y_val, y_val_pred_tree, y_val_pred_rf, model1_name="Predict No Churn", model2_name="k-NN",)
 
     auc_dumb = plot_roc_curve(y_val, val_prob_dumb, "Predict No Churn")
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN")
     auc_tree = plot_roc_curve(y_val, val_prob_tree, "Decision Tree")
     auc_rf = plot_roc_curve(y_val, val_prob_rf, "Random Forest Classifier")
 
-    auc_dumb = roc_auc_score(y_val, val_prob_dumb)
-    auc_knn = roc_auc_score(y_val, val_prob_knn)
-    auc_tree = roc_auc_score(y_val, val_prob_tree)
-    auc_rf = roc_auc_score(y_val, val_prob_rf)
+    auc_dumb = roc_auc_score(y_val, val_prob_dumb, "Predict No Churn", show=False)
+    auc_knn = roc_auc_score(y_val, val_prob_knn, "k-NN", show=False)
+    auc_tree = roc_auc_score(y_val, val_prob_tree, "Decision Tree", show=False)
+    auc_rf = roc_auc_score(y_val, val_prob_rf, "Random Forest", show=True)
 
     print("Validation AUC - Predict No Churn:")
     print(auc_dumb)
