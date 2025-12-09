@@ -1,74 +1,58 @@
 """
-Naive (dumb) baseline model for customer churn prediction.
-This module implements a DummyClassifier that always predicts no churn.
-It serves as a minimum-performance baseline for comparison against
-more complex machine learning models.
+This baseline does not use machine learning. It applies simple rules motivated by
+EDA on four key features:
 """
 
-import pandas as pd
-from sklearn.dummy import DummyClassifier
 import os
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    classification_report,
-    roc_auc_score,
-)
+import numpy as np
+import pandas as pd
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_matrix
 
-BASELINE_FEATURES = [
-    "Total Spend",
-    "Usage Frequency",
+SMART_BASELINE_FEATURES = [
     "Support Calls",
+    "Payment Delay",
+    "Total Spend",
+    "Age",
 ]
 
-def train_dumb_model(X_train, y_train):
-    """ Train and return a naive baseline model that always predicts no churn. """
 
-    model = DummyClassifier(strategy="constant", constant=0)
-    model.fit(X_train, y_train)
-    return model
+def smart_baseline_predict(df: pd.DataFrame) -> pd.Series:
+    """
+    Vectorized rule-based churn prediction on a DataFrame.
+    """
+    rule = (
+        (df["Support Calls"] >= 5)
+        | (df["Payment Delay"] >= 20)
+        | (df["Total Spend"] < 500)
+        | (df["Age"] >= 50)
+    )
+    return rule.astype(int)
 
 if __name__ == "__main__":
     train = pd.read_csv("data/processed/train_clean.csv")
     test = pd.read_csv("data/processed/test_clean.csv")
+   
+    y_true = train["Churn"]
+    y_pred = smart_baseline_predict(train)
 
-    X = train[BASELINE_FEATURES]
-    y = train["Churn"]
+    acc  = accuracy_score(y_true, y_pred)
+    f1   = f1_score(y_true, y_pred)
+    auc  = roc_auc_score(y_true, y_pred)
+    conf = confusion_matrix(y_true, y_pred)
 
-    X_train, X_val, y_train, y_val = train_test_split(
-        X,
-        y,
-        test_size=0.3,
-        random_state=1234,
-        stratify=y,
-    )
-
-    model = train_dumb_model(X_train, y_train)
-    y_pred_val = model.predict(X_val)
-    y_proba_val = model.predict_proba(X_val)[:, 1]
-
-    print("Accuracy:")
-    print(accuracy_score(y_val, y_pred_val))
-    print()
+    print("Smart Rule-Based Baseline")
+    print(f"Accuracy : {acc:.4f}")
+    print(f"F1-score : {f1:.4f}")
+    print(f"ROC AUC  : {auc:.4f}")
     print("Confusion matrix:")
-    print(confusion_matrix(y_val, y_pred_val))
-    print()
-    print("Classification report:")
-    print(classification_report(y_val, y_pred_val))
-    print()
-    print("AUC:")
-    print(roc_auc_score(y_val, y_proba_val))
+    print(conf)
 
-    # Predict on test set (always 0)
-    X_test = test[BASELINE_FEATURES]
-    test_pred = model.predict(X_test)
+    test_pred = smart_baseline_predict(test)
 
     os.makedirs("data/submissions", exist_ok=True)
     submission = pd.DataFrame({
         "CustomerID": test["CustomerID"],
         "Churn": test_pred,
     })
-
-    submission.to_csv("data/submissions/dumb_baseline.csv", index=False)
-    print("Wrote dumb_baseline to a csv")
+    submission.to_csv("data/submissions/smart_baseline.csv", index=False)
+    print("Wrote smart_baseline.csv")

@@ -69,12 +69,16 @@ Jupyter notebooks are used only for exploratory data analysis and experimentatio
         - max_depth
         - min_samples_leaf
 
-
 ## Running the project
-
 Install the dependencies and run the pipeline.
 
-The dependecies are: numpy, pandas, scikit-learn, matplotlib, and seaborn
+All required dependencies are listed in `requirements.txt`.  
+The project relies on standard Python data science libraries including:
+- numpy
+- pandas
+- scikit-learn
+- matplotlib
+- seaborn
 
 You should use the versions of the dependencies as specified by the requirements file:
 

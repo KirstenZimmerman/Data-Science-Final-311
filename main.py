@@ -10,7 +10,7 @@ from src.visualization.eda import (
 from src.utils.helper_functions import plot_roc_curve
 
 from src.models.knn_model import train_knn_model
-from src.models.dumb_model import train_dumb_model
+from src.models.dumb_model import smart_baseline_predict 
 from src.models.decisionTree_model import train_decision_tree_model
 from src.models.randomForestClassifier_model import train_random_forest_model
 
@@ -40,7 +40,7 @@ def main() -> None:
         "data/raw/test.csv",
     )
 
-    # Print shape of the raw dataset
+    #Print shape of the raw dataset
     print(f"Raw dataset shape: {train_raw.shape}")
 
     print("Cleaning data")
@@ -53,9 +53,8 @@ def main() -> None:
     test_clean.to_csv("data/processed/test_clean.csv", index=False)
 
     print("Creating EDA visuals")
-    #plot_eda(train_clean)
 
-    # EDA
+    #EDA
     churn_distribution(train_clean)
     numeric_histograms(train_clean)
     categorical_churn(train_clean)
@@ -86,12 +85,12 @@ def main() -> None:
 
     print("Training models")
     knn_model = train_knn_model(X_train, y_train)
-    dumb_model = train_dumb_model(X_train, y_train)
+    dumb_model = smart_baseline_predict(X_train, y_train)
     tree_model = train_decision_tree_model(X_train, y_train)
     rf_model = train_random_forest_model(X_train, y_train)
 
     print("Evaluating on validation set")
-    # class predictions
+    #class predictions
     y_val_pred_knn = knn_model.predict(X_val)
     y_val_pred_dumb = dumb_model.predict(X_val)
     y_val_pred_tree = tree_model.predict(X_val)
@@ -110,11 +109,6 @@ def main() -> None:
     auc_knn = plot_roc_curve(y_val, val_prob_knn, "k-NN", show=False)
     auc_tree = plot_roc_curve(y_val, val_prob_tree, "Decision Tree", show=False)
     auc_rf = plot_roc_curve(y_val, val_prob_rf, "Random Forest Classifier", show=True)
-
-    # auc_dumb = roc_auc_score(y_val, val_prob_dumb, "Predict No Churn")
-    # auc_knn = roc_auc_score(y_val, val_prob_knn, "k-NN")
-    # auc_tree = roc_auc_score(y_val, val_prob_tree, "Decision Tree")
-    # auc_rf = roc_auc_score(y_val, val_prob_rf, "Random Forest", show=True)
 
     print("Validation AUC - Predict No Churn:")
     print(auc_dumb)
